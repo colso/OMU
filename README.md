@@ -11,7 +11,7 @@ $ chmod 755 ./OMU.py
 ```
 3. Run with a messages file 
 ```
-$ ./OMU.py ../<any path>/messages
+$ ./OMU.py /<any path>/messages
 ```
 4. Sometime, If you need to update cut-count and prefix-size. Use according to your preference.
 ```
