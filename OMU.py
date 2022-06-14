@@ -2,11 +2,11 @@
 
 import sys
 import re
-
-name_prefix_trim_size = 10
-rss_top_cut = 8
+import os
+from optparse import OptionParser
 
 class OOM_item:
+    name_prefix_trim_size = 10
     def __init__(self, oom_list, trim_size=name_prefix_trim_size):
         self.uid = int(oom_list[0])
         self.tgid = int(oom_list[1])
@@ -31,6 +31,7 @@ class OOM_item:
                     self.oom_score_adj, self.name))
 
 class OOM:
+    rss_top_cut = 8
     def __init__(self, time, hostname, oom_list):
         self.time = time
         self.hostname = hostname
@@ -46,7 +47,7 @@ class OOM:
         return sorted(ul.items(), key = lambda item: item[1], 
                 reverse = True)[:cut_size]
     def get_info(self):
-        return ("%5s %10s [%21s ]" % ('Date:', self.time, 
+        return ("%5s %10s \t[%22s ]" % ('Date:', self.time, 
                     self.hostname))
     def get_total_rss(self):
         rss_sum = 0
@@ -56,15 +57,16 @@ class OOM:
 
     def top_rss_procs(self, top_cut=rss_top_cut):
         print(self.get_info())
-        print("----------------------------------------------")
+        print("-------------------------------------------------")
         print("%10s \t %10s \t %11s" % ('Pages', 'RSS', 'Proc'))
-        print("----------------------------------------------")
+        print("-------------------------------------------------")
         for rss_item in self.lump_and_sort_for_rss(top_cut):
-            print("%10d \t%3.6f GB \t [%11s]" % (rss_item[1], 
+            print("%10d \t%3.6f GB \t [%14s]" % (rss_item[1], 
                         (float(rss_item[1]*4))/1024/1024 , rss_item[0]))
-        print("----------------------------------------------")
+        print("-------------------------------------------------")
         print("%24d Pages\t : Pages Total" % self.get_total_rss())
-        print("%24f GB \t : RSS Total\n" % (float(self.get_total_rss()*4)/1024/1024))
+        print("%24f GB \t : RSS Total\n" % 
+                (float(self.get_total_rss()*4)/1024/1024))
 
     def et_OL(self):
         return self.OL
@@ -121,7 +123,7 @@ def get_rss_usage(cl_item):
                 ul[OC.get_name()] = OC.get_rss()
     return sorted(ul.items(), key = lambda item: item[1], reverse = True)
 
-def get_OOM_from_chunklist(cl):
+def get_OOM_from_chunklist(cl, pts):
     OCL = []
     # get date and hostname in the first line
     cl_t = cl[0].split()
@@ -130,16 +132,47 @@ def get_OOM_from_chunklist(cl):
 
     for item in cl:
         if len(item) > 3:
-            OCL.append(OOM_item(trim_and_split_oom_proc(item)))
+            OCL.append(OOM_item(trim_and_split_oom_proc(item), pts))
     return OOM(oom_time, oom_hostname, OCL)
 
+def usage():
+    print("usage: OMU.py filepath\n or")
+    print("usage: OMU.py -f filepath [options] arg\n")
+    print("Options:")
+    print("\t-f, --file\t\t file path")
+    print("\t-p, --prefix-trim\t The process name trim size. Processes are going lump")
+    print("\t-c, --top-cut\t\t The RSS top cut size")
+
 def main():
-    with open(sys.argv[1]) as fd:
+    parser = OptionParser()
+    parser.add_option("-f", "--file", type="string", dest="filename")
+    parser.add_option("-p", "--prefix-trim", type="int", dest="ptsize")
+    parser.add_option("-c", "--top-cut", type="int", dest="cutsize")
+    options = None
+    filename = None
+    pts = 10
+    cuts = 7
+
+    if len(sys.argv) < 3:
+        filename = argv[1]
+    else:
+        options, args = parser.parse_args(sys.argv)
+        if options.filename:
+            filename = options.filename
+        if options.ptsize:
+            pts = options.ptsize
+        if options.cutsize:
+            cuts = options.cutsize
+    if not filename or not os.path.isfile(filename):
+        usage()
+        return
+
+    with open(options.filename) as fd:
         c_l = get_chunk_list(fd)
     if c_l:
         for cl_i in c_l:
-            OC = get_OOM_from_chunklist(cl_i)
-            OC.top_rss_procs()
+            OC = get_OOM_from_chunklist(cl_i, pts)
+            OC.top_rss_procs(cuts)
 
 if __name__ in ("__main__"):
     main()
