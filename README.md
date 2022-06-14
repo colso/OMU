@@ -11,14 +11,14 @@ $ chmod 755 ./OMU.py
 ```
 3. Run with a messages file 
 ```
-$ ./OMU.py /<any path>/messages
-```
-4. Sometime, If you need to update cut-count and prefix-size. Use according to your preference.
-```
-$ vi OMU.py
-...
-  6 name_prefix_trim_size = 10     <<<--- process naming length 
-  7 rss_top_cut = 8                <<<--- process cut count
+usage: OMU.py filepath
+ or
+usage: OMU.py -f filepath [options] arg
+
+Options:
+	-f, --file		 file path
+	-p, --prefix-trim	 The process name trim size. Processes are going lump
+	-c, --top-cut		 The RSS top cut size
 ```
 
 ## sample test result
