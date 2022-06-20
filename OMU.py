@@ -149,7 +149,6 @@ def main():
     parser.add_option("-f", "--file", type="string", dest="filename")
     parser.add_option("-p", "--prefix-trim", type="int", dest="ptsize")
     parser.add_option("-c", "--top-cut", type="int", dest="cutsize")
-    parser.add_option("-h", "--help", type="string", dest="helps")
     options = None
     filename = None
     pts = 10
@@ -165,14 +164,12 @@ def main():
             pts = options.ptsize
         if options.cutsize:
             cuts = options.cutsize
-        if options.helps:
-            usage()
 
     if not filename or not os.path.isfile(filename):
         usage()
         return
 
-    with open(options.filename) as fd:
+    with open(filename) as fd:
         c_l = get_chunk_list(fd)
     if c_l:
         for cl_i in c_l:
