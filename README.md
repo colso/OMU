@@ -19,6 +19,7 @@ Options:
 	-f, --file		 file path
 	-p, --prefix-trim	 The process name trim size. Processes are going lump
 	-c, --top-cut		 The RSS top cut size
+    -h, --help           This page
 ```
 
 ## sample test result

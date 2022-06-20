@@ -142,19 +142,21 @@ def usage():
     print("\t-f, --file\t\t file path")
     print("\t-p, --prefix-trim\t The process name trim size. Processes are going lump")
     print("\t-c, --top-cut\t\t The RSS top cut size")
+    print("\t-h, --help\t\t This page")
 
 def main():
     parser = OptionParser()
     parser.add_option("-f", "--file", type="string", dest="filename")
     parser.add_option("-p", "--prefix-trim", type="int", dest="ptsize")
     parser.add_option("-c", "--top-cut", type="int", dest="cutsize")
+    parser.add_option("-h", "--help", type="string", dest="helps")
     options = None
     filename = None
     pts = 10
     cuts = 7
 
     if len(sys.argv) < 3:
-        filename = argv[1]
+        filename = sys.argv[1]
     else:
         options, args = parser.parse_args(sys.argv)
         if options.filename:
@@ -163,6 +165,7 @@ def main():
             pts = options.ptsize
         if options.cutsize:
             cuts = options.cutsize
+        if options.helps:
     if not filename or not os.path.isfile(filename):
         usage()
         return
