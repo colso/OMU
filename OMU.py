@@ -166,6 +166,8 @@ def main():
         if options.cutsize:
             cuts = options.cutsize
         if options.helps:
+            usage()
+
     if not filename or not os.path.isfile(filename):
         usage()
         return
